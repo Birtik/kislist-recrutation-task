@@ -1,0 +1,36 @@
+services:
+  nginx:
+    container_name: nginx
+    build: docker/nginx
+    ports:
+      - "80:80"
+    volumes:
+      - .:/app:cached
+    environment:
+      CONTAINER_APP_NAME: app
+
+  app:
+    build: docker/php
+    environment:
+      PHP_IDE_CONFIG: "serverName=app"
+    volumes:
+      - .:/app:cached
+      - ./docker/php/overrides.ini:/usr/local/etc/php/conf.d/99-overrides.ini
+
+  db:
+    image: pgvector/pgvector:pg15
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-app}
+      POSTGRES_USER: ${POSTGRES_USER:-app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-app}
+    volumes:
+      - db_postgres_15:/var/lib/postgresql/data
+      - ./devkit/postgres/init:/docker-entrypoint-initdb.d:delegated
+    ports:
+      - "5432:5432"
+
+volumes:
+  db_postgres_15: {}
+###> doctrine/doctrine-bundle ###
+  db-data:
+###< doctrine/doctrine-bundle ###

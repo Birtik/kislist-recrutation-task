@@ -1,0 +1,40 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+    #    bind:
+    #      $progressCommandBus: '@books.command.bus'
+
+    Task\Books\Framework\Controller\:
+        resource: '../src/Books/Framework/Controller/'
+        tags: [ 'controller.service_arguments' ]
+
+    Task\Books\Infrastructure\Dbal\Repository\DbalBookRepository: ~
+    Task\Books\Infrastructure\Dbal\Repository\DbalHireRepository: ~
+    Task\Books\Infrastructure\Dbal\Repository\DbalBorrowerRepository: ~
+
+    Task\Books\Domain\Book\Repository\BookRepository: '@Task\Books\Infrastructure\Dbal\Repository\DbalBookRepository'
+    Task\Books\Domain\Hire\Repository\HireRepository: '@Task\Books\Infrastructure\Dbal\Repository\DbalHireRepository'
+    Task\Books\Domain\Borrower\Repository\BorrowerRepository: '@Task\Books\Infrastructure\Dbal\Repository\DbalBorrowerRepository'
+
+    Task\Books\Application\Book\View\BuildBookViewCollection: ~
+
+    Task\Books\Infrastructure\Dbal\Query\DbalGetBookListDataQuery: ~
+    Task\Books\Application\Book\Query\GetBookListDataQuery: '@Task\Books\Infrastructure\Dbal\Query\DbalGetBookListDataQuery'
+
+    Task\Books\Application\Book\Handler\CreateBookHandler: ~
+    Task\Books\Application\Book\Handler\UpdateBookHandler: ~
+    Task\Books\Application\Book\Handler\DeleteBookHandler: ~
+
+    Task\Books\Framework\EventSubscriber\ExceptionSubscriber:
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception }
+
+    Task\Books\Application\Book\Validator\RequestDataValidator: ~
+
+    Task\Books\Framework\EventSubscriber\WithRequestValidatorSubscriber:
+        tags:
+            - { name: kernel.event_subscriber }
+
+    Task\Books\Framework\Messenger\Middleware\ThrowOriginalExceptionMiddleware: ~
